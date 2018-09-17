@@ -1,0 +1,22 @@
+Define methods that Platforms should publish to be accesible via a generic fdc3Access instance
+
+Applications:
+  Fdc3ListApplications();   // Return a short list of the applications the platform supports (== can start)
+  Fdc3GetApplicationDetails
+
+  Fdc3StartApplication.
+
+  Fdc3ListInstances
+
+  Fdc3ActivateAppInstance
+  
+  Fdc3GetPlatformInfo
+
+
+Intents:
+  But also methods are tagged on a Platform so 
+  Fdc3RxIntent<IntentName>
+
+Context:
+  Fdc3RxContext
+

@@ -1,3 +1,20 @@
+/**
+* Copyright © 2014-2018 Tick42 BG OOD
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 type Context = Object;
 type IntentName = String;
 type AppIdentifier = String;
@@ -57,13 +74,28 @@ interface fdc3Access {
      */
     openApplication(name: String, context?: Context, config?: String): Promise<ApplicationInstance>;
   
-    //TODO: Add methods to return the list of application instances.
+    /**
+     * List the running instances of an Application.
+     * This is an optional method, some Platforms may not be able to track instances 
+     * or may not be able to track instances of certain application types.
+     * 
+     * NB: The insnatnces can be activated or used for Intent activation 
+     * @param name   Name or AppId of the application.
+     */
     listApplicationInstances(name: string): Promise<ApplicationInstance[]>;
 
-    //TODO: Add option to list the App Direftories this instance is connected to
+    /**
+     * Activate (give focus, bring to front) and application instance/
+     * this is optional and may only be available on certain platfomrs and/or Application Types.
+     * @param instance 
+     */
+    activateAppInstance( instance: ApplicationInstance );     
+    
+    /**
+     * Provide a list of 'read only' info on the platforms that this instance of fdc3Access is providing access to.
+     */
+    listAppDirectories(): Promise<ApplicationDirectoryServer[]>;
 
-    //TODO: Add an option to 'activate' an app instance.
-    activateAppInstance( instance: ApplicationInstance );
 
     // Intents -----------------
   
@@ -78,20 +110,33 @@ interface fdc3Access {
     resolveByIntent(intent: IntentName, context?: Context): Promise<AppIntent[]>;
 
     /**
-     * Return the Intents available that can implement an action fo the given Context.
+     * Return the Intents available that can implement an action for the given Context.
      * @param context 
      */
     resolveByContext(context: Context ): Promise<Array<Intent>>;
   
+
+    /**
+     * Return the Intents available that can implement an action for the given Context.
+     * @param contextTypes  A list of contextTypes, independant of a particular context 
+     */
+    resolveByContextType(contextTypes: string[] ): Promise<Array<Intent>>;
+
     /**
      * Raises an intent to the desktop agent to resolve.
      */
-    raiseIntent(intent: IntentName, context: Context, target: String): Promise<IntentResolution>;
+    raiseIntent(intent: IntentName, context: Context, target?: ApplicationInstance): Promise<IntentResolution>;
   
     /**
-     * Listens to incoming Intents from the Agent.
+     * Listens to incoming Intents from the Platforms.
+     * This potentially can also register a method.
+     * TODO: Can a single application provide multiple listents for an Intent ?
+     * 
+     * @param intent The name of the Intent to implement.
+     * @param contextTypes The context types for which this handler is valid. 
+     * @param handler The application handler to implement this intent for the listed contextTypes
      */
-    intentListener(intent: IntentName, handler: (context: Context) => void): Listener;
+    intentListener(intent: IntentName, contextTypes: string[], handler: (context: Context, caller?: ApplicationInstance ) => void): Listener;
   
     // Context --------------------
     /**
@@ -106,11 +151,10 @@ interface fdc3Access {
 
     // Platform -----------
     /**
-     * Some method to return 'read only' info on the set of Platforms this access instance is connected to
-     * 
-     * TODO: Include Platform connection  status 
+     * Provide a list of 'read only' info on the platforms that this instance of fdc3Access is providing access to.
      */
-    listPlatforms();
+    listPlatforms(): Promise<Platform[]>;
+
 
     //TODO: Implement listener to report platform status chnages.
 
@@ -186,6 +230,8 @@ interface AppMetadata {
 
 /**
  * IntentResolution provides a standard format for data returned upon resolving an intent.
+ * TODO: I don't understand what this does, is it about returning results, what does the version do?
+ * Is the source, the ApplicationInstance that implemented the Intent?
  */
 interface IntentResolution {
   source: String;
