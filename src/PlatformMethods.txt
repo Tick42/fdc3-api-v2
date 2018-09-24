@@ -2,11 +2,17 @@ Define methods that Platforms should publish to be accesible via a generic fdc3A
 
 Applications:
   Fdc3ListApplications();   // Return a short list of the applications the platform supports (== can start)
-  Fdc3GetApplicationDetails
+     NOT SURE ABOUT THIS.
 
-  Fdc3StartApplication.
+  Fdc3GetApplicationDetails - Return details of an applicationt that then Platform supports
 
-  Fdc3ListInstances
+  Fdc3StartApplication. - Generic start method.
+
+  Fdc3StartApplication<AppType> - A method to launch a specific type of application
+
+  Fdc3FindApplication - Takes an app name and returns a list of <Application> instances (list may be empty)
+ 
+  Fdc3ListAppInstances
 
   Fdc3ActivateAppInstance
   
@@ -19,4 +25,5 @@ Intents:
 
 Context:
   Fdc3RxContext
+  Fdc3GetContext - Get the current context for the Platform.
 
