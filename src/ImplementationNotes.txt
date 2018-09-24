@@ -1,0 +1,28 @@
+Note on implementing the various interface methods when managing a set of Platforms.
+This is related to the Artchitecture.txt and will probably merge into one document.
+
+openApplication(app: string|Application, context?: Context, config?: string, platform?: string|Platform):
+   Promise<ApplicationInstance>;
+
+For a valid application, The FDC3 instance needs to invoke one of
+     Fdc3StartApplication. - Generic start method.
+
+     Fdc3StartApplication<AppType> - A method to launch a specific type of application
+ On the appropriate method.
+
+ The easiest way to do that is for the FDC3 instance to hold the merged map of all the Application Directories
+ but this is a big data set to hold for each application instance.
+ Instead I see two possible solutions:
+ A. If the openApplication is paased on Application instance this describes the application type and the Platform 
+ that supports the application. So the FDC3 Instance can use the following logic:
+    - If the Platform exports a method of Fdc3StartApplication<AppType> then call that method.
+    - If not then If the Platform exports Fdc3StartApplication call that.
+    - If the Platform exports multiple start app methods then this is a config error.
+
+B. If the client just passes a string then we have the name of the app, and the FDC3 instance looks for implementations of
+Fdc3FindApplication on all supported Platforms and then :
+- If Platform parameter is specified, restrict search to that Platform else search all connected Platforms.
+- If noone knows the app - fail.
+- If only one instance - Launch using loigc from Step A.
+- If multiple matches - Fail with appropriate error message.
+

@@ -1,0 +1,10 @@
+Architecture.
+
+A Platform can provide it's own implementation of the FDC3 API interface, or it can publish a set of Interop methods as defined in PlatformMethods.txt. 
+
+A generic open source mulotiplexing API will be provided that can provide access to a set of Platforms that poublish the required API. 
+
+The 'multiplexing' API implementation will be published as open source and hosted as part of the FDC3 API. This implementation can also merge Platforms that publish a native implementation 
+
+The FDC3 API has been designed so that it does NOT need to keep track of all applications defined in the various App Directory instances. This means that the FDC3 Application methods will need to inclkude the platform name in the application name IFF an FDC3 Instance is working with multiple platforms.
+ 
