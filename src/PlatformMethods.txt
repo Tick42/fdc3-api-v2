@@ -20,6 +20,12 @@ Applications:
 
 
 Intents:
+  Fdc3GetIntentsByName
+  Fdc3GetIntentsByContextType
+  Fdc3GetIntentsByContext
+
+  
+  
   But also methods are tagged on a Platform so 
   Fdc3RxIntent<IntentName>
 

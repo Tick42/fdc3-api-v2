@@ -53,10 +53,81 @@ Throw error if Platform does not support this method or Platform connection is o
 Intents.
 ==========
 
+Using the terminology of a fuller Interop system, an Intent is a Request/Response method that takes a Context 
+as it's sole parameter. 
+Typically an Intent does not return a value and is a mechanism for transferring control to another application, 
+often from a popup menu on a selected data item which is used to build the context.
+
+ 
+
 resolveByIntent
 ---------------
 (intent: IntentName, context?: Context): Promise<Intent[]>;
+resolveByContext
+----------------
+(context: Context ): Promise<IntentList[]>;
+resolveByContextType
+--------------------
+(contextTypes: string[] ): Promise<IntentList[]>;
 
+The three methods above are used to get the set of Applications that are relevant to the call.
+The set of Applications is in two partys. 
+  - Applications defined in App Directories which can be launched in order to implement an Intent on a context.
+  - Running Applicagtions which can implement an Intent on a context.
+  NB The running applications will often be running instances of the Applications defined in the  Applications list 
+  but this is not always the case. For example major 'desktop terminals' will often not be defined in an App Directory
+  but can implement many intents.
+
+The three resolveBy* methods are typically used by a 'resolver' to build the selection of 'targets' to present to
+the user.
+They call the FDC3 methods 
+
+  Fdc3GetIntentsByName
+  Fdc3GetIntentsByContextType
+  Fdc3GetIntentsByContext
+  
+These three methods are typically offered by apps that are connected to the App Directories e.g. Launchers, to return
+the IntentApplication list. These three methods are also typically implemented by a 'controller'/'monitor' on each Platform that 
+tracks running instances on the Platform and returns the list of IntentApplicationInstance.
+
+These lists are then processed in order to create the appropriate UI for the user to select a destination and the Intent is 
+'fired' by invoking the relevant method. This is typicall a method called 
+Fdc3RxIntent<IntentName>
+
+However methods published using the FINOS Interop API can also be tagged as implementing an Intent using the method meta data.
+
+raiseIntent
+-----------
+(intentName: string, context: Context, app: Application|ApplicationInstance): Promise<IntentResult>;
+
+Raise an intent aka execute the Action.
+- If app is an App Instance, then 
+  - check if the application instance implements the method
+       Fdc3RxIntent<IntentName>
+     If so invoke the method passing context and form IntentResult.
+  - Else check if any of the other methods offered by the app instance are tagged as supporting the Intent for the given Context.
+  use the first method (if any that matches)
+  - Else fail syaing App instance cannot handle Intent <name> for Context <context>, also fail is app instance is not running.
+
+- If app is an application, then IMO start a new instance and use that instance to implement the method using the logic
+for the App Instance above.
+
+raiseIntent
+-----------
+(intentName: string, context: Context): Promise<IntentResult>;
+
+Call ResolveIntent( intentName, context )
+
+Walk the list of Application Instances and find the first instance that can support the Intent for the given context and
+fire the event on that context.
+NB Maybe we should prompt the user to select valid instances, need to think about the UI for running instances vs Applications.
+
+intentListener
+--------------
+(intentName: string, contextTypes: string[], handler: (context: Context, caller?: ApplicationInstance ) => object): Listener;
+Publish a method named
+Fdc3RxIntent<IntentName> e.g. Fdc3RxIntentShowChart
+If we already have a registration for this method, then IMO raise an error but maybve we could MUX or silently replace.
 
 Context
 =======

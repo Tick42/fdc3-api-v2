@@ -15,9 +15,6 @@
 * limitations under the License.
 */
 
-type Context = Object;
-type IntentName = String;
-type AppIdentifier = String;
 
 enum OpenError {
   AppNotFound = "AppNotFound",
@@ -117,7 +114,7 @@ interface fdc3Access {
    * @param context : An optional Context that is used to filter the Intents. 
    *                  
    */
-    resolveByIntent(intent: IntentName, context?: Context): Promise<IntentList[]>;
+    resolveByIntent(intentName: string, context?: Context): Promise<IntentList[]>;
 
     /**
      * Return the Intents available that can implement an action for the given Context.
@@ -132,13 +129,22 @@ interface fdc3Access {
      */
     resolveByContextType(contextTypes: string[] ): Promise<IntentList[]>;
 
-    /**
-     * Raises an intent to the desktop agent to resolve.
+   /**
+     * Execute/raise/call/fire the Intent using the given application or ApplicationInstance
      */
-    raiseIntent(intentName: string, context: Context): Promise<IntentResolution>;
+    raiseIntent(intentName: string, context: Context, app: Application|ApplicationInstance): Promise<IntentResult>;
+ 
+    /**
+     * Raises an intent allow the implementation to select an app to implement this.
+     */
+    raiseIntent(intentName: string, context: Context): Promise<IntentResult>;
 
-    raiseIntent(intentName: string, app: Application, context: Context): Promise<>;
-  
+    /**
+     * Execute/raise/call/fire the Intent using the given application.
+     */
+    raiseIntent(intentName: string, context: Context, app: Application|ApplicationInstance): Promise<IntentResult>;
+
+
     /**
      * Listens to incoming Intents from the Platforms.
      * This potentially can also register a method.
@@ -148,7 +154,7 @@ interface fdc3Access {
      * @param contextTypes The context types for which this handler is valid. 
      * @param handler The application handler to implement this intent for the listed contextTypes
      */
-    intentListener(intent: IntentName, contextTypes: string[], handler: (context: Context, caller?: ApplicationInstance ) => void): Listener;
+    intentListener(intentName: string, contextTypes: string[], handler: (context: Context, caller?: ApplicationInstance ) => object): Listener;
   
     // Context --------------------
     /**
@@ -242,30 +248,13 @@ interface IntentList {
 interface IntentApplication {
   application: Application;
   contextTypes: string; // Defines the list of context types this application can handle the Intent.
+  methodName?: string;  // The method to invoke that implementes the Intent, default is Fdc3RxIntent<IntentName>
 }
 
 interface IntentApplicationInstance {
   instance: ApplicationInstance;  // The running Applicastion instance that can handle the Intent
   contextTypes: string; // Defines list of context types.
-}
-
-interface Intent {
-  intent: IntentName;
-  context: Context;
-  /**
-   * Name of app to target for the Intent. Use if creating an explicit intent
-   * that bypasses resolver and goes directly to an app.
-   */
-  target?: AppIdentifier;
-  
-  /**
-   * Dispatches the intent with the Desktop Agent.
-   * 
-   * Accepts context data and target (if an explicit Intent) as optional args.
-   * Returns a Promise - resolving if the intent successfully results in launching an App.
-   * If the resolution errors, it returns an `Error` with a string from the `ResolveError` enumeration.
-   */
-  send(context: Context, target?: AppIdentifier): Promise<void>
+  methodName?: string;  // The method to invoke that implementes the Intent, default is Fdc3RxIntent<IntentName>
 }
 
 /**
@@ -273,10 +262,9 @@ interface Intent {
  * TODO: I don't understand what this does, is it about returning results, what does the version do?
  * Is the source, the ApplicationInstance that implemented the Intent?
  */
-interface IntentResolution {
-  source: String;
-  data?: Object; 
-  version: String;
+interface IntentResult {
+  app: ApplicationInstance; // The application instance that handled the Intent
+  result?: Object; // Optional result data from the Intent.
 }
 
 interface Listener {
@@ -291,4 +279,30 @@ interface BroadcastResult
   success: boolean;
   error: SendError;
   errorMsg?: string;  // Optional detailed error message, esp if error == PlatformError.
+}
+
+/**
+ * A context consists of one or more data items.
+ * A data item e.g, an instrumnent or a c lient could be described using multiple formats.
+ */
+interface Context {
+  items: ContextItem[];
+}
+
+/**
+ * A single context data item.
+ * NB A data items may be presented using multiple formats.
+ */
+interface ContextItem {
+  itemFormat: ContextItemFormat[];  // The data items 
+
+  /**
+   * Return a  comma separated list of all the formats used to define this data item.
+   */
+  getFormats() : string;  
+}
+
+interface ContextItemFormat {
+  format: string; //The name of the format using FDC3 Context WG format == type.
+  data: object;   // The item data in the given format.
 }
