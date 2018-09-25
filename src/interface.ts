@@ -152,9 +152,10 @@ interface fdc3Access {
      * 
      * @param intent The name of the Intent to implement.
      * @param contextTypes The context types for which this handler is valid. 
+     * @param platformName Which Platform should the method be published on, if emptuy or null chose the default platform
      * @param handler The application handler to implement this intent for the listed contextTypes
      */
-    intentListener(intentName: string, contextTypes: string[], handler: (context: Context, caller?: ApplicationInstance ) => object): Listener;
+    intentListener(intentName: string, contextTypes: string[], platformName: string, handler: (context: Context, caller?: ApplicationInstance ) => object): Listener;
   
     // Context --------------------
     /**
@@ -166,7 +167,7 @@ interface fdc3Access {
     /**
      * Listens to incoming context broadcast from the Desktop Agent.
      */
-    contextListener(handler: (context: Context) => void): Listener;
+    contextListener(platformName:string, handler: (context: Context) => void): Listener;
 
     // Platform -----------
     /**
