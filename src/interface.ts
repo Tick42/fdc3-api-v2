@@ -32,6 +32,13 @@ enum ResolveError {
   ResolverTimeout = "ResolverTimeout"
 }
 
+enum SendError {
+  SendOK = "OK",
+  UnknownPlatform = "Invalid Platform",
+  PlatformNotConnected = "Platform Not connected",
+  PlatformError = "Platform Error"
+}
+
 /**
  * An fdc3Access instance provides an application with access to the FDC3 services provided by one
  * or more platforms.
@@ -81,9 +88,12 @@ interface fdc3Access {
      * or may not be able to track instances of certain application types.
      * 
      * NB: The insnatnces can be activated or used for Intent activation 
-     * @param name   Name or AppId of the application.
+     * @param name   Name or AppId of the application or the Application definition returned from an App Directory.
+     * @param platform  Optional, name of the platform hosting the application. THis can help speed up the search if
+     *                    - FDC3 App instance hosts multiple Platforms.
+     *                    - Using app name rather than Application definition.
      */
-    listApplicationInstances(name: string): Promise<ApplicationInstance[]>;
+    listApplicationInstances(app: string|Application, platform?: string): Promise<ApplicationInstance[]>;
 
     /**
      * Activate (give focus, bring to front) and application instance/
@@ -95,6 +105,10 @@ interface fdc3Access {
 
     // Intents -----------------
   
+    // The Resolve methods listed below are available to allow the Resolver functionality to be implemented
+    // This can be implemented, as a DesktopAgent resolver or directly implemented by the client applications
+    // using these methods.
+
   /**
    * Return the set of applications which can 'implement' the given Intent.
    * Optionally restrict the Intent by an actual Context, this might restrict applications
@@ -103,25 +117,27 @@ interface fdc3Access {
    * @param context : An optional Context that is used to filter the Intents. 
    *                  
    */
-    resolveByIntent(intent: IntentName, context?: Context): Promise<Intent[]>;
+    resolveByIntent(intent: IntentName, context?: Context): Promise<IntentList[]>;
 
     /**
      * Return the Intents available that can implement an action for the given Context.
      * @param context 
      */
-    resolveByContext(context: Context ): Promise<Array<Intent>>;
+    resolveByContext(context: Context ): Promise<IntentList[]>;
   
 
     /**
      * Return the Intents available that can implement an action for the given Context.
      * @param contextTypes  A list of contextTypes, independant of a particular context 
      */
-    resolveByContextType(contextTypes: string[] ): Promise<Array<Intent>>;
+    resolveByContextType(contextTypes: string[] ): Promise<IntentList[]>;
 
     /**
      * Raises an intent to the desktop agent to resolve.
      */
-    raiseIntent(intent: IntentName|Intent, context: Context): Promise<IntentResolution>;
+    raiseIntent(intentName: string, context: Context): Promise<IntentResolution>;
+
+    raiseIntent(intentName: string, app: Application, context: Context): Promise<>;
   
     /**
      * Listens to incoming Intents from the Platforms.
@@ -137,8 +153,9 @@ interface fdc3Access {
     // Context --------------------
     /**
      * Publishes context to other apps on the desktop.
+     * TODO: Invoke promise to indicate sent or connection failure
      */
-    broadcast(context: Context): void;
+    broadcast(context: Context, instance?: ApplicationInstance): Promise<BroadcastResult>;
 
     /**
      * Listens to incoming context broadcast from the Desktop Agent.
@@ -151,6 +168,7 @@ interface fdc3Access {
      */
     listPlatforms(): Promise<Platform[]>;
 
+    // TODO: Implement events to track Platforms going off line.
 
     //TODO: Implement listener to report platform status chnages.
 
@@ -167,6 +185,9 @@ interface fdc3Access {
 interface Platform {
   name: string;
   version: string;
+  online: boolean;
+  connectionStatus: string; // Error text describing !online state
+  config?: string; // Optional read only Platform config (often JSon) for use in debugging.
   platformApi?: object; // optional accessor to the Platform interop API, for example the Platform Agnostic interop API
 }
 
@@ -207,6 +228,26 @@ enum fdc3AccessFeature {
     context
 }
 
+/**
+ * Provide a list of applications that can be started that can handle an Intent
+ */
+interface IntentList {
+  intentName; string;
+
+  applications: IntentApplication[];  // List of 0 or more applications that can be opened to handle an Intent
+  applicationInstances: IntentApplicationInstance[]; // List of 0 or more applications that are already running that can handle the Intent.
+}
+
+
+interface IntentApplication {
+  application: Application;
+  contextTypes: string; // Defines the list of context types this application can handle the Intent.
+}
+
+interface IntentApplicationInstance {
+  instance: ApplicationInstance;  // The running Applicastion instance that can handle the Intent
+  contextTypes: string; // Defines list of context types.
+}
 
 interface Intent {
   intent: IntentName;
@@ -245,49 +286,9 @@ interface Listener {
   unsubscribe();
 }
 
-/**
- * A Desktop Agent is a desktop component (or aggregate of components) that serves as a
- * launcher and message router (broker) for applications in its domain.
- * 
- * A Desktop Agent can be connected to one or more App Directories and will use directories for application
- * identity and discovery. Typically, a Desktop Agent will contain the proprietary logic of
- * a given platform, handling functionality like explicit application interop workflows where
- * security, consistency, and implementation requirements are proprietary.
- */
-interface DesktopAgent {
-  /**
-   * Launches/links to an app by name.
-   * 
-   * If opening errors, it returns an `Error` with a string from the `OpenError` enumeration.
-   */
-  open(name: String, context?: Context): Promise<void>;
-
-  /**
-   * Resolves a intent & context pair to a list of App names/metadata.
-   *
-   * Resolve is effectively granting programmatic access to the Desktop Agent's resolver. 
-   * Returns a promise that resolves to an Array. The resolved dataset & metadata is Desktop Agent-specific.
-   * If the resolution errors, it returns an `Error` with a string from the `ResolveError` enumeration.
-   */
-  resolve(intent: IntentName, context: Context): Promise<Array<AppMetadata>>;
-
-  /**
-   * Publishes context to other apps on the desktop.
-   */
-  broadcast(context: Context): void;
-
-  /**
-   * Raises an intent to the desktop agent to resolve.
-   */
-  raiseIntent(intent: IntentName, context: Context, target: String): Promise<IntentResolution>;
-
-  /**
-   * Listens to incoming Intents from the Agent.
-   */
-  intentListener(intent: IntentName, handler: (context: Context) => void): Listener;
-
-  /**
-   * Listens to incoming context broadcast from the Desktop Agent.
-   */
-  contextListener(handler: (context: Context) => void): Listener;
+interface BroadcastResult
+{
+  success: boolean;
+  error: SendError;
+  errorMsg?: string;  // Optional detailed error message, esp if error == PlatformError.
 }

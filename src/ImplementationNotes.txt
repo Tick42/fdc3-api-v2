@@ -1,7 +1,12 @@
 Note on implementing the various interface methods when managing a set of Platforms.
 This is related to the Artchitecture.txt and will probably merge into one document.
 
-openApplication(app: string|Application, context?: Context, config?: string, platform?: string|Platform):
+Application.
+============
+
+openApplication
+---------------
+   (app: string|Application, context?: Context, config?: string, platform?: string|Platform):
    Promise<ApplicationInstance>;
 
 For a valid application, The FDC3 instance needs to invoke one of
@@ -25,4 +30,61 @@ Fdc3FindApplication on all supported Platforms and then :
 - If noone knows the app - fail.
 - If only one instance - Launch using loigc from Step A.
 - If multiple matches - Fail with appropriate error message.
+
+
+listApplicationInstances
+------------------------
+(name: string): Promise<ApplicationInstance[]>;
+  Use 'find app logic' from openApplication and then use Fdc3ListAppInstances.
+  NB - I think we can cache Application  info.
+  NB1 Must query the Platform and not rely on tracking start/stop app calls.
+  NB2 we could implement start / stop events but this call is really only used from launcher in 
+  response to a mouse over so fine to make an Interop call or two.
+
+activateAppInstance
+-------------------
+( instance: ApplicationInstance )
+
+app Instance contains info on the Platform so this is just a call to 
+Fdc3ActivateAppInstance
+Throw error if Platform does not support this method or Platform connection is offline or instance is no longer running.
+
+
+Intents.
+==========
+
+resolveByIntent
+---------------
+(intent: IntentName, context?: Context): Promise<Intent[]>;
+
+
+Context
+=======
+
+broadcast
+---------
+(context: Context): Promise<BroadcastResult>;
+
+Call the Fdc3RxContext on each connected Platform.
+
+contextListener
+---------------
+(handler: (context: Context) => void): Listener;
+
+Publish Fdc3RxContext method for this caller (or Platform implementes a simple Mux map).
+When an app 'registers' invoke the Liatener with the current context.
+
+Platform
+========
+
+I think this is obvious :)
+
+
+DesktopAgent
+============
+Show mapping of DesktopAgent into calls on FDC3Instance.
+
+TODO: Create DesktopAgent-interop-impl.ts
+
+ 
 
