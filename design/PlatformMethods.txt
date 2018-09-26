@@ -1,35 +1,36 @@
-Define methods that Platforms should publish to be accesible via a generic fdc3Access instance
+Define methods that Platforms should publish to be accesible via a generic fdc3Access instance. 
 
-Applications:
-  Fdc3ListApplications();   // Return a short list of the applications the platform supports (== can start)
-     NOT SURE ABOUT THIS.
+A platform can chose to implement any subset of methods that make sense for its implementation, the only method it is required to publish is the Fdc3GetPlatformInfo method.
 
-  Fdc3GetApplicationDetails - Return details of an applicationt that then Platform supports
+The methods are typically implemented by a FDC3 Manager and/or a Toolbar/Launcher which may have connected to one or more FDC3  App Directory servers.
 
+The methods are grouped into the following Categories. 
+
+App Definitions:
+  Fdc3ListApplications();   // Return a  list of applications. This an Interop version of the App Directory REST service.
+  Fdc3GetApplicationDetails - Return details of an application.
+
+App Management:
   Fdc3StartApplication. - Generic start method.
 
   Fdc3StartApplication<AppType> - A method to launch a specific type of application
-
-  Fdc3FindApplication - Takes an app name and returns a list of <Application> instances (list may be empty)
+    e.g. Fdc3StartApplicationExe and Fdc3StartApplicationBrowser
  
-  Fdc3ListAppInstances
+  Fdc3ListAppInstances - Get a list of application instances (== Running apps) for a given Application.
 
-  Fdc3ActivateAppInstance
-  
-  Fdc3GetPlatformInfo
-
+  Fdc3ActivateAppInstance - Activate (give Focus and bring to front) an App Instance
 
 Intents:
   Fdc3GetIntentsByName
   Fdc3GetIntentsByContextType
   Fdc3GetIntentsByContext
-
-  
   
   But also methods are tagged on a Platform so 
-  Fdc3RxIntent<IntentName>
+  Fdc3RxIntent<IntentName> e.g. Fdc3RxIntentShowChart
 
 Context:
-  Fdc3RxContext
+  Fdc3RxContext  - Receive broadcast of a new Context.
   Fdc3GetContext - Get the current context for the Platform.
 
+Misc:  
+  Fdc3GetPlatformInfo
