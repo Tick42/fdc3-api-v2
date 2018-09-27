@@ -1,45 +1,94 @@
-import {fdc3Access} from "./interface"
+
+/**
+* Copyright © 2014-2018 Tick42 BG OOD
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/**
+ * This file shows how the current FDC3 API DesktopAgent interface can be implemented in terms of the 
+ * interface proposed here. 
+ */
+import { fdc3Access, ApplicationInstance } from "../src/interface"
+import { Context as ContextV2 } from '../src/interface'
 
 class MultiPlatformAgent implements DesktopAgent {
   platforms: fdc3Access;  // Our connection to the Platforms that represent 
   defaultPlatformName: string;  // Default Platform name
 
-  open(name: String, context?: Context): Promise<void>
-  {
-      return this.platforms.openApplication(name as string, context);
+  open(name: String, context?: Context): Promise<void> {
+    return new Promise((resolve, reject) => {
+
+      this.platforms.open(name as string, context as ContextV2)
+        .then(() => { resolve() })
+        .catch(() => { reject() });
+    }
+    );
   }
 
-  resolve(intent: IntentName, context: Context): Promise<Array<AppMetadata>>
-  {
-      //TODO: I'm not sure how this works, is this returning an array of app instances?
-      // in which case
-      const instances = this.platforms.resolveByIntent(intent as string, context);
-      // Map to return type, also needs to stay a promise
+  resolve(intent: IntentName, context: Context): Promise<Array<AppMetadata>> {
+    //TODO: I'm not sure how this is meant to work. What is in the AppMetadata ?
 
+    return new Promise((resolve, reject) => {
+      this.platforms.resolveByIntent(intent as string, context as ContextV2)
+        .then((instances)=>{
+           const mapped : AppMetadata[] = undefined;
+           /*
+             TODO Not sure of structure of the AppMetadata IntentResolution. 
+             In the API proposed here, resolve returns a list of Applications which can opened and running
+             applications on which the Intent could be raised using Interop.
+
+             it is important to realise that not all applications will be defined in an App Directory
+           */
+           resolve(mapped);
+        })
+        .catch(reject);
+      });
+  }
+
+  broadcast(context: Context): void {
+    this.platforms.broadcast(context as ContextV2);
+  }
+
+  raiseIntent(intent: IntentName, context: Context, target?: String): Promise<IntentResolution> {
+
+    return new Promise((resolve, reject) => {
+      this.platforms.raiseIntent(intent as string, context as ContextV2)
+        .then((result)=>{
+           var resultV1 : IntentResolution;
+           resultV1.data=result.result;
+           resultV1.source = result.app.app.appId;  // TODO What kind of representation is used for an application instance 
+           resultV1.version = ""; //TODO What kind of value is here
+
+           resolve(resultV1);
+        })
+        .catch(reject);
+      });
+
+  }
+
+  intentListener(intent: IntentName, handler: (context: Context) => void): Listener {
+    //TODO map handler types
+    return this.platforms.intentListener(intent as string, "*", (context:ContextV2, caller?: ApplicationInstance):object=>{
       return null;
+    });
   }
 
-  broadcast(context: Context): void
-  {
-      this.platforms.broadcast(context);
+  contextListener(handler: (context: Context) => void): Listener {
+    return this.platforms.contextListener(handler);
   }
 
-  raiseIntent(intent: IntentName, context: Context, target?: String): Promise<IntentResolution>
-  {
-      return this.platforms.raiseIntent(intent, context);
-  }
-
-  intentListener(intent: IntentName, handler: (context: Context) => void): Listener
-  {
-      // Not sure how to implement this.
-      return this.platforms.intentListener(intent, "", this.defaultPlatformName, handler);
-  }
-
-  contextListener(handler: (context: Context) => void): Listener
-  {
-      return this.platforms.contextListener(this.defaultPlatformName, handler );
-  }
-  
 }
 
 // Currenty desktop agent - master branch  --------------------------
@@ -73,7 +122,7 @@ interface AppMetadata {
  */
 interface IntentResolution {
   source: String;
-  data?: Object; 
+  data?: Object;
   version: String;
 }
 
