@@ -57,7 +57,7 @@ enum SendError {
  * 
  * Usage Note: Identity and Secutiry are key issues to be addressed in a future iteration.
  */
-interface fdc3Access {
+export interface fdc3Access {
 
    // Applications -----------
    /**
