@@ -64,7 +64,7 @@ class MultiPlatformAgent implements DesktopAgent {
   raiseIntent(intent: IntentName, context: Context, target?: String): Promise<IntentResolution> {
 
     return new Promise((resolve, reject) => {
-      this.platforms.raiseIntent(intent as string, context as ContextV2)
+      this.platforms.raiseIntentPrompt(intent as string, context as ContextV2)
         .then((result)=>{
            var resultV1 : IntentResolution;
            resultV1.data=result.result;
