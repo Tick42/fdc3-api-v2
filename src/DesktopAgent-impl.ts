@@ -1,17 +1,19 @@
+import {fdc3Access} from "./interface"
+
 class MultiPlatformAgent implements DesktopAgent {
   platforms: fdc3Access;  // Our connection to the Platforms that represent 
   defaultPlatformName: string;  // Default Platform name
 
   open(name: String, context?: Context): Promise<void>
   {
-      return this.platforms.openApplication(name, context);
+      return this.platforms.openApplication(name as string, context);
   }
 
   resolve(intent: IntentName, context: Context): Promise<Array<AppMetadata>>
   {
       //TODO: I'm not sure how this works, is this returning an array of app instances?
       // in which case
-      instances = this.platforms.resolveByIntent(intent, context);
+      const instances = this.platforms.resolveByIntent(intent as string, context);
       // Map to return type, also needs to stay a promise
 
       return null;
@@ -24,7 +26,7 @@ class MultiPlatformAgent implements DesktopAgent {
 
   raiseIntent(intent: IntentName, context: Context, target?: String): Promise<IntentResolution>
   {
-      this.platforms.raiseIntent(intent, context);
+      return this.platforms.raiseIntent(intent, context);
   }
 
   intentListener(intent: IntentName, handler: (context: Context) => void): Listener
@@ -35,7 +37,7 @@ class MultiPlatformAgent implements DesktopAgent {
 
   contextListener(handler: (context: Context) => void): Listener
   {
-      return this.contextListener(defaultPlatformName, handler );
+      return this.platforms.contextListener(this.defaultPlatformName, handler );
   }
   
 }
