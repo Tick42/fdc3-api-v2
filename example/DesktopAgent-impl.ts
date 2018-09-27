@@ -91,7 +91,7 @@ class MultiPlatformAgent implements DesktopAgent {
 
 }
 
-// Currenty desktop agent - master branch  --------------------------
+// Current desktop agent - master branch  --------------------------
 type Context = Object;
 type IntentName = String;
 type AppIdentifier = String;
