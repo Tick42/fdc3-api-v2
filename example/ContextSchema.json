@@ -20,7 +20,7 @@
             "description": "TODO: How is this used, is it identifying which version of the Context Schema this definition is using. If so how are versions managed. TODO: Should we have a default ?",
             "default": "false"
         },
-         "items": {
+         "contextItems": {
             "description": "A Context can hold one or more data items. The most common scenario is a single item like a client or an Instrument. Where multiple items are present, there is an open question whether they all MUST be the same type",
             "type": "array",
             "items": {
@@ -32,9 +32,23 @@
     "definitions": {
         "contextItem": {
             "description": "A single data item in a Context. The data item e.g. the Client or the Instrument can be described using multiple formats. Each format is identified by a type name. A single format may contain multiple fields to describe the Instrument for example holding the Reuters, Bloomberg and ISIN codes for an Equity. However different format types may have different names for these fields and there may also be rules about which fields are mandatory. ",
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/contextItemFormat"
+            "type": "object",
+            "properties": {
+                "displayName": {
+                    "description": "A simple name for this item  e.g. Apple, AAPL or Fred Smith. The name is unlikely to be able to be useful for any processing, but it is useful to show to the user or use in debug/log messages",
+                    "type": "string"
+                },                
+                "displayType": {
+                    "description": "A short hand 'meta' name for this item type that is useful to show to the user or use in debug/log messages e.g.  Instrument, or Equity or Contact. It does not correspond to a formal context type. ",
+                    "type": "string"
+                },
+                "data": {
+                    "description": "The actual data that defines/describes the Item. This can be presented in one or more formats, which allows different groups, including in-house development teams, to define their own data sets without worrying about field name clashes with other groups",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/contextItemFormat"
+                    }
+                }
             },
             "additionalProperties": false
          },
