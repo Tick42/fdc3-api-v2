@@ -2,7 +2,7 @@ Architecture.
 
 A Platform can provide it's own implementation of the FDC3 API interface. This note covers the architecture used by Platforms that integrate with FDC3 by implementing a small set of interop methods, which are then presented as an FDC3 API interface by a common multi-platform FDC3 API implementation.
 
-The 'multiplexing' API implementation will be published as open source and hosted as part of the FDC3 API.  
+The 'multiplexing' API implementation will be published as open source and hosted as part of the FDC3 API.
 
 Each platform will typically have an FDC3 Manager module which publishes the methods used to implement the FDC3 API.
 
@@ -15,15 +15,15 @@ Consider the following hypothetical example. A user has deployed two platforms:
 
 Both platforms implement the FINOS Interop API (using different implementations) and have each implemented the appropriate managers so that they can work with the FDC3 API.
 
-The Glue42 Desktop includes a toolbar/launcher which has connected to a number of FDC3 App Directory servers that deifne a number of Desktop exe's, desktop browser hosted applications, Glue42 HTML5 container applications and some Eikon applications which are used by some of the in-house Glue42 applications.
+The Glue42 Desktop includes a toolbar/launcher which has connected to a number of FDC3 App Directory servers that define a number of Desktop exes, desktop browser hosted applications, Glue42 HTML5 container applications and some Eikon applications which are used by some of the in-house Glue42 applications.
 NB. The Toolbar contains applications which run on other Platforms (Eikon) and applications which are not FDC3 compliant.
 
 The Launcher publishes the "App Definitions" group of Methods using the Glue42 platform.
 
-The Glue42 FDC3 Manager publishes the App Mgt, Intents, Context and Misc methods. 
+The Glue42 FDC3 Manager publishes the App Mgt, Intents, Context and Misc methods.
 
 The TR Eikon FDC3 Manager published the App Mgt, Intents and Misc.
-NB Eikon is chosing (in this implementation) not to publish any Application Definition methods (it allows users to define the Eikon windows it requires in internal App Directories) and also it does not publish the Context methods.
+NB Eikon is choosing (in this implementation) not to publish any Application Definition methods (it allows users to define the Eikon windows it requires in internal App Directories) and also it does not publish the Context methods.
 
 Starting an Application.
 ------------------------
@@ -38,4 +38,4 @@ Setting the Context.
 --------------------
 
 
- 
+

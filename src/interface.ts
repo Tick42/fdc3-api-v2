@@ -15,7 +15,6 @@
 * limitations under the License.
 */
 
-
 enum OpenError {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
@@ -39,22 +38,22 @@ enum SendError {
 /**
  * An fdc3Access instance provides an application with access to the FDC3 services provided by one
  * or more platforms.
- * Usage Note. For applications running on a Platform, the Platform may provide a pre-initialised 
- * fdc3Access instance. Applications may also instantiate their own instances which connect directly 
+ * Usage Note. For applications running on a Platform, the Platform may provide a preinitialized
+ * fdc3Access instance. Applications may also instantiate their own instances which connect directly
  * to the Platforms.
- * 
- * The current FDC3 services available via fdc3Access are :
- *  - Application management, which covers launching and activating applications. It is expected that the 
+ *
+ * The current FDC3 services available via fdc3Access are:
+ *   - Application management, which covers launching and activating applications. It is expected that the
  * applications available will have been read from one or more App Directory services but this is NOT a requirement.
  * NB Should we include the enumerate apps here or leave that to the AppD REST API (my vote).
  *   - Intents, listing Intents and firing them.
  *   - Contexts, broadcasting 'current context' to interested applications.
- * 
+ *
  * The definitions of Applications, Intents and Contexts follow the proposals from the various FDC3 Working groups.
- * At some point in the future this interface can reference approved and (versioned) definitiosn from the WG's
- * in this iteration, the appropriate definitions have been copied in here to enable this to be a self contained
+ * At some point in the future this interface can reference approved and (versioned) definitions from the WGs.
+ * In this iteration, the appropriate definitions have been copied in here to enable this to be a self contained
  * proposal.
- * 
+ *
  * Usage Note: Identity and Security are key issues to be addressed in a future iteration.
  */
 export interface fdc3Access {
@@ -67,35 +66,35 @@ export interface fdc3Access {
 
   /**
    * Launches/links to an app by name.
-   * 
+   *
    * If opening errors, it returns an `Error` with a string from the `OpenError` enumeration.
-   * 
-   * config is optional config that may allow the caller to specify start poisitons etc.
-   * 
-   * TODO: Retrun a launch object which can provide launch errors and also optional access to 
+   *
+   * config is optional and may allow the caller to specify start positions etc.
+   *
+   * TODO: Return a launch object which can provide launch errors and also optional access to
    * an applicationInstanceId to identify an application instance.
    * TODO: Check on app name vs app id in AppD structure.
-   * Default platform ?
+   * Default platform?
    */
   open(app: string | Application, context?: Context, config?: string, platform?: string | Platform): Promise<ApplicationInstance>;
 
   /**
    * List the running instances of an Application.
-   * This is an optional method, some Platforms may not be able to track instances 
+   * This is an optional method, some Platforms may not be able to track instances
    * or may not be able to track instances of certain application types.
-   * 
-   * NB: The insnatnces can be activated or used for Intent activation 
-   * @param name   Name or AppId of the application or the Application definition returned from an App Directory.
-   * @param platform  Optional, identify the platform hosting the application. THis can help speed up the search if
+   *
+   * NB: The instances can be activated or used for Intent activation.
+   * @param name      Name or AppId of the application or the Application definition returned from an App Directory.
+   * @param platform  Optional, identify the platform hosting the application. This can help speed up the search if
    *                    - FDC3 App instance hosts multiple Platforms.
    *                    - Using app name rather than Application definition.
    */
   listInstances(app: string | Application, platform?: string | Platform): Promise<ApplicationInstance[]>;
 
   /**
-   * Activate (give focus, bring to front) and application instance/
-   * this is optional and may only be available on certain platfomrs and/or Application Types.
-   * @param instance 
+   * Activate (give focus, bring to front) the application instance.
+   * this is optional and may only be available on certain platforms and/or Application Types.
+   * @param instance
    */
   activateInstance(instance: ApplicationInstance);
 
@@ -107,10 +106,10 @@ export interface fdc3Access {
   // using these methods.
 
   /**
-   * Prompt the user to select which Application (from the Intent handlers returned by resoveByContext
+   * Prompt the user to select which Application (from the Intent handlers returned by resolveByContext)
    * Should be 'raised'
-   * Use raiseIntent to fire the selected Intent
-   * @param context 
+   * Use raiseIntent to fire the selected Intent.
+   * @param context
    */
   resolveByContextPrompt(context: Context): Promise<IntentHandler>;
 
@@ -119,10 +118,10 @@ export interface fdc3Access {
    * Prompt the user to select which Application should be used to handle the given Intent.
    * Use raiseIntent to fire the Intent on the selected app
    * @param intent : The name of the Intent
-   * @param context : An optional Context that is used to filter the Intents. 
-   * 
-   * @returns The application (which needs to be opened) or the Application Instance (which needs to be invoked) to 
-   *   raise the intent. 
+   * @param context : An optional Context that is used to filter the Intents.
+   *
+   * @returns The application (which needs to be opened) or the Application Instance (which needs to be invoked) to
+   *   raise the intent.
    */
   resolveByIntentPrompt(intentName: string, context?: Context): Promise<IntentHandler>;
 
@@ -131,31 +130,30 @@ export interface fdc3Access {
    * Optionally restrict the Intent by an actual Context, this might restrict applications
    * For example a Trade application may only be valid for Exchange traded equities
    * @param intent : The name of the Intent
-   * @param context : An optional Context that is used to filter the Intents. 
-   * 
-   * @returns list of applications and/or Application instances that implement this Intent (optionally restrictedc by the contect)
-   *   An Intent can then be raised (aka fired aka executed aka invoked) by opening an app or 
+   * @param context : An optional Context that is used to filter the Intents.
+   *
+   * @returns list of applications and/or Application instances that implement this Intent (optionally restricted by the context)
+   *   An Intent can then be raised (aka fired aka executed aka invoked) by opening an app or
    *   invoking the method on an instance
    */
   resolveByIntent(intentName: string, context?: Context): Promise<IntentList>;
 
   /**
    * Return the Intents available that can implement an action for the given Context.
-   * @param context 
+   * @param context
    */
   resolveByContext(context: Context): Promise<IntentList[]>;
 
-
   /**
    * Return the Intents available that can implement an action for the given Context.
-   * @param contextTypes  A list of contextTypes, independant of a particular context 
+   * @param contextTypes  A list of contextTypes, independent of a particular context
    */
   resolveByContextType(contextTypes: string[]): Promise<IntentList[]>;
 
   /**
-    * Execute/raise/call/fire the Intent for the given context. 
+    * Execute/raise/call/fire the Intent for the given context.
     * If there are multiple relevant applications and applicationInstances that can handle this request
-    * some UI mechanism will be used (typically a popup menu) to allow the user to select which application
+    * some UI mechanism will be used (typically a pop-up menu) to allow the user to select which application
     * should handle this request.
     * @param intentName - The intent to raise aka fire aka execute aka Invoke.
     * @param context - The context for the invoke.
@@ -165,21 +163,20 @@ export interface fdc3Access {
 
   /**
    * Execute/raise/call/fire the Intent using the given application.
-   * 
+   *
    * @param intentName - The intent to raise aka fire aka execute aka Invoke.
    * @param context - The context for the invoke.
    * @param targetApp - Optional override to select which app or appInstance should handle the Intent.
    */
   raiseIntent(intent: IntentHandler, context: Context): Promise<IntentResult>;
 
-
   /**
    * Listens to incoming Intents from the Platforms.
    * This potentially can also register a method.
-   * TODO: Can a single application provide multiple listents for an Intent ?
-   * 
+   * TODO: Can a single application provide multiple listeners for an Intent?
+   *
    * @param intent The name of the Intent to implement.
-   * @param contextTypes The context types for which this handler is valid. 
+   * @param contextTypes The context types for which this handler is valid.
    *   NB If a single string is passed, parse it for comma separated types
    * @param handler The application handler to implement this intent for the listed contextTypes
    */
@@ -208,10 +205,9 @@ export interface fdc3Access {
   // Capabilities -----------------
   /**
    * List capabilities that are supported by this instance
-   * TODO: Should we allow the user app to switch off a capability in an instance, for example disable the App Directory stuff and 
+   * TODO: Should we allow the user app to switch off a capability in an instance, for example disable the App Directory stuff and
    * maybe App start to save space. Or defer this to the 'factory' method that an app uses to get an instance ?
    */
-
 }
 
 /** Describe a platform which the Desktop Agent provides access */
@@ -219,30 +215,28 @@ export interface Platform {
   name: string;
   version: string;
   online: boolean;
-  connectionStatus: string; // Error text describing !online state
+  connectionStatus: string; // Error text describing !online state.
   config?: string; // Optional read only Platform config (often JSon) for use in debugging.
-  platformApi?: object; // optional accessor to the Platform interop API, for example the Platform Agnostic interop API
+  platformApi?: object; // optional accessor to the Platform interop API, for example the Platform Agnostic interop API.
 }
 
 /**
- * An FDC3 Application. 
- * UsageNote: Typically FDC3 applications are defined in an Applicastion Directory and started via FDC3
- * However applications can also be started 'outside' FDC3 and announce themselves. 
+ * An FDC3 Application.
+ * UsageNote: Typically FDC3 applications are defined in an Application Directory and started via FDC3
+ * However applications can also be started 'outside' FDC3 and announce themselves.
  */
 export interface Application {
   appId: string;  // FDC App D unique id. or missing if empty or null then this is not an App Directory defined application
   name?: string;  // App name
-  platformName: string;  // If the application runs on a Platform, the name of the Platform. 
+  platformName: string;  // If the application runs on a Platform, the name of the Platform.
   appType?: string; // FDC3 AppD application type.
 }
 
 export interface ApplicationInstance {
   app: Application;
-  instanceId: string; // some id that uniquely indicates selects an instance of the app.
+  instanceId: string; // An id that uniquely indicates/selects an instance of the app.
   // Can be blank if this is a single instance app.
-
 }
-
 
 enum fdc3AccessFeature {
   startApplication,
@@ -262,26 +256,25 @@ export interface IntentList {
   applicationInstances: IntentApplicationInstance[]; // List of 0 or more applications that are already running that can handle the Intent.
 }
 
-
 export interface IntentApplication {
   application: Application;
   contextTypes: string; // Defines the list of context types this application can handle the Intent.
-  methodName?: string;  // The method to invoke that implementes the Intent, default is Fdc3RxIntent<IntentName>
+  methodName?: string;  // The method to invoke that implements the Intent, default is Fdc3RxIntent<IntentName>
 }
 
 export interface IntentApplicationInstance {
-  instance: ApplicationInstance;  // The running Applicastion instance that can handle the Intent
+  instance: ApplicationInstance;  // The running Application instance that can handle the Intent
   contextTypes: string; // Defines list of context types.
-  methodName?: string;  // The method to invoke that implementes the Intent, default is Fdc3RxIntent<IntentName>
+  methodName?: string;  // The method to invoke that implements the Intent, default is Fdc3RxIntent<IntentName>
 }
-
 
 export interface IntentHandler {
   name: string;
   application: Application | ApplicationInstance;
   contextTypes: string; // Defines the list of context types this application can handle the Intent.
-  methodName?: string;  // The method to invoke that implementes the Intent, default is Fdc3RxIntent<IntentName>
+  methodName?: string;  // The method to invoke that implements the Intent, default is Fdc3RxIntent<IntentName>
 }
+
 /**
  * IntentResolution provides a standard format for data returned upon resolving an intent.
  * TODO: I don't understand what this does, is it about returning results, what does the version do?
@@ -307,7 +300,7 @@ export interface BroadcastResult {
 
 /**
  * A context consists of one or more data items.
- * A data item e.g, an instrumnent or a c lient could be described using multiple formats.
+ * A data item e.g, an instrument or a client could be described using multiple formats.
  */
 export interface Context {
   items: ContextItem[];
@@ -318,7 +311,7 @@ export interface Context {
  * NB A data items may be presented using multiple formats.
  */
 export interface ContextItem {
-  itemFormat: ContextItemFormat[];  // The data items 
+  itemFormat: ContextItemFormat[];  // The data items
 
   /**
    * Return a  comma separated list of all the formats used to define this data item.

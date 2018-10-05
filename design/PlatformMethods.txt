@@ -1,13 +1,13 @@
-Define methods that Platforms should publish to be accesible via a generic fdc3Access instance. 
+Define methods that Platforms should publish to be accessible via a generic fdc3Access instance.
 
 A platform can chose to implement any subset of methods that make sense for its implementation, the only method it is required to publish is the Fdc3GetPlatformInfo method.
 
 The methods are typically implemented by a FDC3 Manager and/or a Toolbar/Launcher which may have connected to one or more FDC3  App Directory servers.
 
-The methods are grouped into the following Categories. 
+The methods are grouped into the following Categories.
 
 App Definitions:
-  Fdc3ListApplications();   // Return a  list of applications. This an Interop version of the App Directory REST service.
+  Fdc3ListApplications      - Return a  list of applications. This is an Interop version of the App Directory REST service.
   Fdc3GetApplicationDetails - Return details of an application.
 
 App Management:
@@ -15,7 +15,7 @@ App Management:
 
   Fdc3StartApplication<AppType> - A method to launch a specific type of application
     e.g. Fdc3StartApplicationExe and Fdc3StartApplicationBrowser
- 
+
   Fdc3ListAppInstances - Get a list of application instances (== Running apps) for a given Application.
 
   Fdc3ActivateAppInstance - Activate (give Focus and bring to front) an App Instance
@@ -24,13 +24,13 @@ Intents:
   Fdc3GetIntentsByName
   Fdc3GetIntentsByContextType
   Fdc3GetIntentsByContext
-  
-  But also methods are tagged on a Platform so 
+
+  But also methods are tagged on a Platform so
   Fdc3RxIntent<IntentName> e.g. Fdc3RxIntentShowChart
 
 Context:
   Fdc3RxContext  - Receive broadcast of a new Context.
   Fdc3GetContext - Get the current context for the Platform.
 
-Misc:  
+Misc:
   Fdc3GetPlatformInfo
