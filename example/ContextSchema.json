@@ -4,11 +4,12 @@
     "description": "Schema describing the FDC3 Context data item.",
     "title": "Context",
     "type": "object",
+    "required": ["objectType", "contextItems"], 
     "properties": {
         "objectType": {
             "type": "string",
             "description": "Confirm the JSon object type. The only valid value is fdc3-context.TODO:Misho how do we specify this in schema ?",
-            "default": "false"
+            "enum": ["fdc3-context"]
         },
         "definition": {
             "type": "string",
@@ -23,6 +24,7 @@
          "contextItems": {
             "description": "A Context can hold one or more data items. The most common scenario is a single item like a client or an Instrument. Where multiple items are present, there is an open question whether they all MUST be the same type",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "$ref": "#/definitions/contextItem"
             },
@@ -31,8 +33,9 @@
     },
     "definitions": {
         "contextItem": {
-            "description": "A single data item in a Context. The data item e.g. the Client or the Instrument can be described using multiple formats. Each format is identified by a type name. A single format may contain multiple fields to describe the Instrument for example holding the Reuters, Bloomberg and ISIN codes for an Equity. However different format types may have different names for these fields and there may also be rules about which fields are mandatory. ",
+            "description": "A single data item in a Context. The data item e.g. the Client or the Instrument can be described using 1 or more formats. Each format is identified by a type name. A single format may contain multiple fields to describe the Instrument for example holding the Reuters, Bloomberg and ISIN codes for an Equity. However different format types may have different names for these fields and there may also be rules about which fields are mandatory. ",
             "type": "object",
+            "required": ["displayName", "data"],
             "properties": {
                 "displayName": {
                     "description": "A simple name for this item  e.g. Apple, AAPL or Fred Smith. The name is unlikely to be able to be useful for any processing, but it is useful to show to the user or use in debug/log messages",
@@ -45,6 +48,7 @@
                 "data": {
                     "description": "The actual data that defines/describes the Item. This can be presented in one or more formats, which allows different groups, including in-house development teams, to define their own data sets without worrying about field name clashes with other groups",
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/contextItemFormat"
                     }
@@ -56,6 +60,7 @@
          "contextItemFormat": {
             "description": "The data that describes/defines a context item in a particular format",
             "type": "object",
+            "required": ["format", "itemData"],
             "properties": {
                 "format": {
                     "type": "string",
@@ -67,7 +72,7 @@
                     "description": "Optional format type version  ",
                     "default": "false"
                 },
-                "data": {
+                "itemData": {
                     "type": "object",
                     "description": "The data that describes the field, typically a JSon object but data type depends on the format",
                     "default": "false"

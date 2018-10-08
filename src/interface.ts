@@ -307,7 +307,8 @@ export interface BroadcastResult {
 
 /**
  * A context consists of one or more data items.
- * A data item e.g, an instrumnent or a c lient could be described using multiple formats.
+ * A data item e.g, an instrument or a client could be described using multiple formats.
+ * TODO: Do all items need to be of the same type
  */
 export interface Context {
   items: ContextItem[];
