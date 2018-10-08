@@ -10,7 +10,7 @@
             {
                 "format": "fdc3.security",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "ISIN": "",
                     "CUSIP": "",
                     "BBG": "",
@@ -23,7 +23,7 @@
             {
                 "format": "com.factset.security",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "ticker": "",
                     "symbology.entity":"",
                     "regionalticker": ""                        
@@ -32,7 +32,7 @@
             {
                 "format": "figi.???",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "ticker": "",
                     "symbology.entity":"",
                     "regionalticker": ""                        
@@ -41,7 +41,7 @@
             {
                 "format": "custom.tick42.demo.Instrument",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "!!!!": "",
                     "symbology.entity":"",
                     "regionalticker": ""                        

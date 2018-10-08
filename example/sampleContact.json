@@ -10,13 +10,13 @@
             {
                 "format": "fdc3.Contact",
                 "version": "0.0.1",
-                "data": {                       
+                "itemData": {                       
                 }
             },
             {
                 "format": "com.symphony.Contact",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "ticker": "",
                     "symbology.entity":"",
                     "regionalticker": ""                        
@@ -25,7 +25,7 @@
             {
                 "format": "com.microsoft.Outlook.Contact",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "ticker": "",
                     "symbology.entity":"",
                     "regionalticker": ""                        
@@ -34,7 +34,7 @@
             {
                 "format": "custom.tick42.demo.Contact",
                 "version": "0.0.1",
-                "data": {
+                "itemData": {
                     "!!!!": ""                        
                 }
             }
