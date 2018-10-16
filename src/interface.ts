@@ -15,20 +15,20 @@
 * limitations under the License.
 */
 
-enum OpenError {
+export enum OpenError {
   AppNotFound = "AppNotFound",
   ErrorOnLaunch = "ErrorOnLaunch",
   AppTimeout = "AppTimeout",
   ResolverUnavailable = "ResolverUnavailable"
 }
 
-enum ResolveError {
+export enum ResolveError {
   NoAppsFound = "NoAppsFound",
   ResolverUnavailable = "ResolverUnavailable",
   ResolverTimeout = "ResolverTimeout"
 }
 
-enum SendError {
+export enum SendError {
   SendOK = "OK",
   UnknownPlatform = "Invalid Platform",
   PlatformNotConnected = "Platform Not connected",
@@ -238,7 +238,7 @@ export interface ApplicationInstance {
   // Can be blank if this is a single instance app.
 }
 
-enum fdc3AccessFeature {
+export enum fdc3AccessFeature {
   startApplication,
   listApplications,
   getIntents,
@@ -285,7 +285,7 @@ export interface IntentResult {
   result?: Object; // Optional result data from the Intent.
 }
 
-interface Listener {
+export interface Listener {
   /**
    * Unsubscribe the listener object.
    */
