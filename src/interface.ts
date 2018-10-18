@@ -76,7 +76,7 @@ export interface fdc3Access {
    * TODO: Check on app name vs app id in AppD structure.
    * Default platform?
    */
-  open(app: string | Application, context?: Context, config?: string, platform?: string | Platform): Promise<ApplicationInstance>;
+  open(app: string | Application, context?: Context, config?: object, platform?: string | Platform): Promise<ApplicationInstance>;
 
   /**
    * List the running instances of an Application.
